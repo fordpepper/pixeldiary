@@ -1,0 +1,88 @@
+name: Build PixelDiary
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y python3-tk
+          pip install pyinstaller
+      - name: Build
+        run: pyinstaller diary.spec --clean --noconfirm
+      - name: Package
+        run: |
+          mkdir -p release
+          cp dist/PixelDiary release/PixelDiary
+          cp start.txt release/start.txt
+          cp HOW_TO_INSTALL.txt release/HOW_TO_INSTALL.txt
+          cd release && zip ../PixelDiary_Linux.zip *
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PixelDiary_Linux
+          path: PixelDiary_Linux.zip
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pyinstaller
+      - name: Build
+        run: pyinstaller diary.spec --clean --noconfirm
+      - name: Package
+        run: |
+          mkdir release
+          copy dist\PixelDiary.exe release\PixelDiary.exe
+          copy start.txt release\start.txt
+          copy HOW_TO_INSTALL.txt release\HOW_TO_INSTALL.txt
+          cd release
+          Compress-Archive -Path * -DestinationPath ..\PixelDiary_Windows.zip
+        shell: powershell
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PixelDiary_Windows
+          path: PixelDiary_Windows.zip
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pyinstaller
+      - name: Build
+        run: pyinstaller diary.spec --clean --noconfirm
+      - name: Package
+        run: |
+          mkdir -p release
+          cp -r dist/PixelDiary.app release/PixelDiary.app
+          cp start.txt release/start.txt
+          cp HOW_TO_INSTALL.txt release/HOW_TO_INSTALL.txt
+          cd release && zip -r ../PixelDiary_macOS.zip *
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PixelDiary_macOS
+          path: PixelDiary_macOS.zip
