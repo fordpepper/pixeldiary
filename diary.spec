@@ -17,6 +17,12 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# Icon path per platform
+if sys.platform == 'win32':
+    icon_file = 'assets/icon.ico'
+else:
+    icon_file = 'assets/icon.png'
+
 exe = EXE(
     pyz,
     a.scripts,
@@ -31,7 +37,7 @@ exe = EXE(
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,
-    icon=None,
+    icon=icon_file,
 )
 
 # macOS: wrap in a .app bundle
@@ -40,4 +46,5 @@ if sys.platform == 'darwin':
         exe,
         name='PixelDiary.app',
         bundle_identifier='com.pixeldiary',
+        icon='assets/icon.png',
     )

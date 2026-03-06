@@ -95,6 +95,13 @@ class PixelDiary:
         self.root.resizable(True, True)
         self.root.minsize(CW, CH)
 
+        # Set window icon
+        try:
+            _icon = PhotoImage(file=os.path.join(ASSETS_DIR, 'icon.png'))
+            self.root.wm_iconphoto(True, _icon)
+        except Exception:
+            pass
+
         self.scale = DEFAULT_SCALE
 
         self.canvas = tk.Canvas(
